@@ -569,7 +569,7 @@ const CIM_BASE = {
   fTitulo: 'georgia', fSecao: 'georgia', fItem: 'georgia',
   escala: 1, espSecao: 1, titSize: 15, titCaixa: 'normal', titTrac: 0.5, trac: 1,
   moldura: 'simples', separador: 'linha', ouEstilo: 'ou', alinha: 'center', caixa: 'upper', descItalic: true,
-  reguaTexto: 'Cardápio', subtitulo: '', rodape: '', contato: false, cw: 100, ch: 210,
+  reguaTexto: 'Cardápio', subtitulo: '', rodape: '', contato: false, cw: 100, ch: 210, ouSize: 1,
   logo: 'com', logoTam: 25, logoCor: 'original', margem: 9
 };
 
@@ -601,7 +601,49 @@ const CIM_MODELOS = {
       fTitulo: 'montserrat', fSecao: 'montserrat', fItem: 'montserrat', titSize: 13, titCaixa: 'upper', titTrac: 3, moldura: 'nenhuma', separador: 'nenhum', trac: 1.3, descItalic: false, logo: 'sem', reguaTexto: '' } },
   manuscrito: { nome: 'Manuscrito Dourado', desc: 'Título em letra manuscrita, delicado e festivo.',
     cfg: { fundo: '#fffefb', titulo: '#a07f45', secao: '#2a2a2a', item: '#3a3a3a', desc: '#8a8a8a', linha: '#c9b47a',
-      fTitulo: 'script', fSecao: 'cormorant', fItem: 'cormorant', titSize: 26, titTrac: 0, moldura: 'simples', separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.1, logo: 'sem' } }
+      fTitulo: 'script', fSecao: 'cormorant', fItem: 'cormorant', titSize: 26, titTrac: 0, moldura: 'simples', separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.1, logo: 'sem' } },
+  marfim: { nome: 'Marfim Clássico', desc: 'Marfim, grafite e fio dourado. Serve para quase tudo.',
+    cfg: { fundo: '#fdfbf4', titulo: '#2b2b2b', secao: '#9a7b2e', item: '#2f2f2f', desc: '#807c73', linha: '#c9b47a',
+      fTitulo: 'playfair', fSecao: 'garamond', fItem: 'garamond', titSize: 15, moldura: 'simples', escala: 1.05 } },
+  sintraclaro: { nome: 'Sintra Claro', desc: 'As cores da casa em tom claro — verde, dourado e branco.',
+    cfg: { fundo: '#f2f6ef', titulo: '#1e4028', secao: '#7a5c0a', item: '#1a2e1e', desc: '#5f7064', linha: '#9fb79f',
+      fTitulo: 'playfair', fSecao: 'garamond', fItem: 'garamond', titSize: 16, moldura: 'cantos', escala: 1.05 } },
+  carvao: { nome: 'Carvão e Ouro', desc: 'Preto fosco com ouro velho. Jantar de gala.',
+    cfg: { fundo: '#1c1c1c', titulo: '#e4c77b', secao: '#c9a449', item: '#f0ece2', desc: '#a39b88', linha: '#c9a449',
+      fTitulo: 'cormorant', fSecao: 'cormorant', fItem: 'cormorant', titSize: 17, moldura: 'simples', escala: 1.1, logo: 'sem', logoCor: '#e4c77b' } },
+  rose: { nome: 'Rosé Champagne', desc: 'Rosado suave com terracota clara. Casamentos e batizados.',
+    cfg: { fundo: '#fdf3f0', titulo: '#8c5a4e', secao: '#b07c63', item: '#4a3b36', desc: '#94786e', linha: '#d9ad93',
+      fTitulo: 'cormorant', fSecao: 'cormorant', fItem: 'cormorant', titSize: 18, moldura: 'simples', separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.05 } },
+  marinho: { nome: 'Marinho e Areia', desc: 'Azul-marinho fundo com areia dourada. Elegante e firme.',
+    cfg: { fundo: '#152a42', titulo: '#f0e2c4', secao: '#d9c08a', item: '#eef2f6', desc: '#a9bace', linha: '#c0a870',
+      fTitulo: 'playfair', fSecao: 'garamond', fItem: 'garamond', titSize: 15, moldura: 'dupla', escala: 1.1, logo: 'sem', logoCor: '#efdfbd' } },
+  terracota: { nome: 'Terracota Mediterrâneo', desc: 'Barro quente com creme. Almoço de verão.',
+    cfg: { fundo: '#a84d32', titulo: '#fdf1e0', secao: '#f3d9b5', item: '#fff7ec', desc: '#edc9a9', linha: '#f0d2ae',
+      fTitulo: 'playfair', fSecao: 'garamond', fItem: 'garamond', titSize: 16, moldura: 'simples', escala: 1.05, logo: 'sem', logoCor: '#fdf1e0' } },
+  pergaminho: { nome: 'Pergaminho', desc: 'Papel envelhecido e tinta sépia. Ar de casa antiga.',
+    cfg: { fundo: '#f3e9d2', titulo: '#5a3b1c', secao: '#8a6726', item: '#3e2d18', desc: '#7d6a4c', linha: '#b99a62',
+      fTitulo: 'garamond', fSecao: 'garamond', fItem: 'garamond', titSize: 17, moldura: 'cantos', separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.05 } },
+  editorial: { nome: 'Branco Editorial', desc: 'Branco puro, letra seca e fios pretos. Corporativo.',
+    cfg: { fundo: '#ffffff', titulo: '#000000', secao: '#000000', item: '#1a1a1a', desc: '#767676', linha: '#000000',
+      fTitulo: 'montserrat', fSecao: 'montserrat', fItem: 'lato', titSize: 11, titCaixa: 'upper', titTrac: 4, trac: 1.6,
+      moldura: 'nenhuma', descItalic: false, logo: 'sem' } },
+  oliveira: { nome: 'Oliveira', desc: 'Verde-oliva com creme. Sossegado, bonito em A5.',
+    cfg: { fundo: '#4a5333', titulo: '#f2efd9', secao: '#d6d49a', item: '#f6f4e4', desc: '#c2c3a4', linha: '#b7b57f',
+      fTitulo: 'cormorant', fSecao: 'cormorant', fItem: 'cormorant', titSize: 18, moldura: 'simples', escala: 1.1, logo: 'sem', logoCor: '#eceabf' } },
+  perola: { nome: 'Pérola e Grafite', desc: 'Cinza-pérola com grafite. Sem cor, só bom gosto.',
+    cfg: { fundo: '#f4f4f2', titulo: '#36393d', secao: '#8d9196', item: '#2c2f33', desc: '#80858b', linha: '#b9bdc2',
+      fTitulo: 'playfair', fSecao: 'montserrat', fItem: 'lato', titSize: 14, titCaixa: 'upper', titTrac: 2.4,
+      moldura: 'simples', descItalic: false } },
+  porto: { nome: 'Vinho do Porto', desc: 'Vinho profundo com ouro antigo e cantos marcados.',
+    cfg: { fundo: '#52121f', titulo: '#f0d9a8', secao: '#d6a95c', item: '#fbf0dc', desc: '#d3b394', linha: '#c08f4a',
+      fTitulo: 'garamond', fSecao: 'garamond', fItem: 'garamond', titSize: 18, moldura: 'cantos', separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.1, logo: 'sem', logoCor: '#f0d9a8' } },
+  lavanda: { nome: 'Lavanda Suave', desc: 'Lilás claro com roxo fechado. Chá e aniversariante.',
+    cfg: { fundo: '#f6f2fa', titulo: '#4b3a66', secao: '#7a639c', item: '#3a3147', desc: '#817a92', linha: '#bda8d6',
+      fTitulo: 'cormorant', fSecao: 'cormorant', fItem: 'cormorant', titSize: 18, moldura: 'simples', separador: 'ornamento', escala: 1.05 } },
+  festivo: { nome: 'Dourado Festivo', desc: 'Título manuscrito grande e moldura dupla. Para festa.',
+    cfg: { fundo: '#fffdf6', titulo: '#b08828', secao: '#3a3a3a', item: '#2e2e2e', desc: '#8a8070', linha: '#d9bd73',
+      fTitulo: 'script', fSecao: 'montserrat', fItem: 'cormorant', titSize: 28, titTrac: 0, moldura: 'dupla',
+      separador: 'ornamento', ouEstilo: 'ornamento', escala: 1.05 } }
 };
 function cimPreset(id) { return Object.assign({}, CIM_BASE, (CIM_MODELOS[id] || CIM_MODELOS.creme).cfg, { modelo: CIM_MODELOS[id] ? id : 'creme' }); }
 
@@ -696,6 +738,8 @@ function cimHtml(c, preview) {
       ? `.sec h2::after{content:'';display:block;width:calc(1.5mm*var(--k));height:calc(1.5mm*var(--k));transform:rotate(45deg);background:var(--linha);margin:calc(1.7mm*var(--k)*var(--u)) ${esq ? '0.6mm' : 'auto'} calc(1.5mm*var(--k)*var(--u))}`
       : `.sec h2::after{content:'';display:block;width:calc(9mm*var(--k));height:0.2mm;background:var(--linha);margin:calc(1.4mm*var(--k)*var(--u)) ${esq ? '0' : 'auto'} calc(1.6mm*var(--k)*var(--u))}`);
   const logoMask = g.logoCor !== 'original';
+  // quanto o "ou" (ou o traço/losango) entre as opções cresce ou diminui
+  const ouK = Math.max(0.3, Math.min(3, Number(g.ouSize) || 1));
   const logoDim = g.logo === 'com' ? [560, 395] : [560, 284];
   const css = `
 @page { size: ${T.w}mm ${T.h}mm; margin: 0; }
@@ -726,10 +770,10 @@ ${sepCss}
 .it { font-family: ${F(g.fItem)}; font-size: calc(9pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.item}; line-height: 1.5; margin-top: calc(0.6mm * var(--k) * var(--u)); }
 .tx { font-family: ${F(g.fItem)}; font-size: calc(8.6pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.desc}; font-style: italic; line-height: 1.55; }
 .ds { font-family: ${F(g.fItem)}; font-size: calc(6.5pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.desc}; ${g.descItalic ? 'font-style: italic;' : ''} line-height: 1.4; }
-.ou { font-family: ${F(g.fItem)}; font-size: calc(7.6pt * var(--k) * var(--u) * var(--e)); color: ${g.linha}; font-style: italic; margin-top: calc(0.8mm * var(--k) * var(--u)); }
-.ou.orn, .ou.tr { height: calc(2.4mm * var(--k) * var(--u)); position: relative; font-size: 0; margin-top: calc(0.4mm * var(--k)); }
-.ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k)); height: calc(1.1mm * var(--k)); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
-.ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k)); height: 0.2mm; background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%); }
+.ou { font-family: ${F(g.fItem)}; font-size: calc(7.6pt * var(--k) * var(--u) * var(--e) * ${ouK}); color: ${g.linha}; font-style: italic; margin-top: calc(0.8mm * var(--k) * var(--u)); }
+.ou.orn, .ou.tr { height: calc(2.4mm * var(--k) * var(--u) * ${ouK}); position: relative; font-size: 0; margin-top: calc(0.4mm * var(--k)); }
+.ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k) * ${ouK}); height: calc(1.1mm * var(--k) * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
+.ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k) * ${ouK}); height: calc(0.2mm * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%); }
 .rodape { position: absolute; left: ${g.margem}mm; right: ${g.margem}mm; bottom: ${g.margem - 1}mm; text-align: center; font-family: ${F(g.fSecao)}; color: ${g.desc}; font-size: calc(6pt * var(--k) * var(--e)); line-height: 1.5; }
 .rodape b { display: block; font-weight: 400; font-style: italic; font-size: calc(7.6pt * var(--k) * var(--e)); color: ${g.secao}; margin-bottom: calc(1mm * var(--k)); }
 .rodape small { display: block; font-size: calc(5.6pt * var(--k) * var(--e)); letter-spacing: calc(0.3pt * var(--k)); }
@@ -804,7 +848,23 @@ function cimMostrarLista() {
           '<button class="btn btn-danger btn-sm" onclick="cimExcluir(\'' + c.id + '\')">🗑</button></div></div>';
       }).join('') + '</div>');
   el.innerHTML = catalogo + meus;
-  el.querySelectorAll('.cim-modelo').forEach((card, i) => cimMiniatura(Object.keys(CIM_MODELOS)[i], card));
+  // são muitos modelos: cada miniatura só é desenhada quando chega perto da tela,
+  // senão o celular trava ao abrir o catálogo
+  const ids = Object.keys(CIM_MODELOS);
+  const cards = el.querySelectorAll('.cim-modelo');
+  if (!('IntersectionObserver' in window)) {
+    cards.forEach((card, i) => cimMiniatura(ids[i], card));
+  } else {
+    const obs = new IntersectionObserver((ents) => {
+      ents.forEach(e => {
+        if (!e.isIntersecting) return;
+        const i = Number(e.target.dataset.cimI);
+        if (!e.target.dataset.cimFeito) { e.target.dataset.cimFeito = '1'; cimMiniatura(ids[i], e.target); }
+        obs.unobserve(e.target);
+      });
+    }, { rootMargin: '400px' });
+    cards.forEach((card, i) => { card.dataset.cimI = i; obs.observe(card); });
+  }
 }
 function cimUsarModelo(id) { cimNovo(id); }
 
@@ -898,6 +958,7 @@ function cimPainel() {
       cimSlider('Espaço entre letras', 'trac', 0, 3, 0.1, g.trac, 1, '×') +
       cimSelect('Enfeite sob o nome da parte', 'separador', [['linha', 'Traço curto'], ['ornamento', 'Losango ◆'], ['nenhum', 'Nenhum']], g.separador) +
       cimSelect('Entre as opções', 'ouEstilo', [['ou', 'A palavra "ou"'], ['traco', 'Traço curto'], ['ornamento', 'Losango ◆']], g.ouEstilo) +
+      cimSlider('Tamanho do "ou" entre as opções', 'ouSize', 50, 250, 10, g.ouSize, 100, '%') +
       cimSelect('Descrições em', 'descItalic', [['true', 'Itálico'], ['false', 'Normal']], String(g.descItalic)) + '</details>';
   }
 
@@ -945,7 +1006,7 @@ function cimAba(a) { _cimTab = a; cimRenderEditor(); }
 function cimCampo(k, v) { _cim[k] = v; if (k === 'tamanho') cimPrevia(); else cimPreviaDebounce(); }
 function cimCfgSet(k, v) {
   if (k === 'descItalic') v = (v === true || v === 'true');
-  const num = ['escala', 'espSecao', 'titSize', 'titTrac', 'trac', 'logoTam', 'margem', 'cw', 'ch'];
+  const num = ['escala', 'espSecao', 'titSize', 'titTrac', 'trac', 'logoTam', 'margem', 'cw', 'ch', 'ouSize'];
   if (num.indexOf(k) >= 0) v = Number(v);
   _cim.config[k] = v; cimPreviaDebounce();
 }
