@@ -430,6 +430,11 @@
   .cim-sl input { flex: 1; } .cim-sl span { min-width: 52px; font-size: 12.5px; text-align: right; }
   .cim-cores { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; }
   .cim-ctl.cor input { width: 42px; height: 30px; padding: 0; border: 1px solid #ccc; border-radius: 6px; }
+  .cim-ctl.cor { flex-wrap: wrap; }
+  .cim-cor-hist { flex: 0 0 100%; display: flex; align-items: center; gap: 4px; margin: -3px 0 7px 0; flex-wrap: wrap; }
+  .cim-cor-hist > i { font-style: normal; font-size: 10.5px; color: rgba(var(--tinta-rgb),.55); margin-right: 1px; }
+  .cim-cor-hist button { width: 19px; height: 19px; border-radius: 5px; border: 1px solid rgba(var(--tinta-rgb),.28); padding: 0; cursor: pointer; flex: none; }
+  .cim-cor-hist button:hover { transform: scale(1.18); border-color: var(--verde); }
   .cim-chips, .cim-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .cim-chip { border: 1.5px solid rgba(var(--tinta-rgb),0.2); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--verde); }
   .cim-chip.on { background: var(--verde); color: #fff; }
@@ -897,8 +902,50 @@ function cimSelect(rotulo, chave, opcoes, valor) {
   return '<div class="cim-ctl"><label>' + rotulo + '</label><select onchange="cimCfgSet(\'' + chave + '\',this.value)">' +
     opcoes.map(o => '<option value="' + o[0] + '"' + (String(valor) === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div>';
 }
+// ---------- fila das cores que já estiveram em cada campo ----------
+// Guardada no aparelho: trocou a cor e não gostou, é só tocar na anterior para voltar.
+var _cimCorHist = cimCorHistLer();
+var _cimCorAntes = {};
+function cimCorHistLer() { try { var d = localStorage.getItem('cimCoresHist'); return d ? JSON.parse(d) : {}; } catch (e) { return {}; } }
+function cimCorHistSalvar() { try { localStorage.setItem('cimCoresHist', JSON.stringify(_cimCorHist)); } catch (e) { } }
+function cimCorGuardar(chave, cor) {
+  if (!cor) return;
+  cor = String(cor).toLowerCase();
+  var l = (_cimCorHist[chave] || []).filter(function(c) { return String(c).toLowerCase() !== cor; });
+  l.unshift(cor);
+  _cimCorHist[chave] = l.slice(0, 8);
+  cimCorHistSalvar();
+}
+// guarda qual era a cor no momento em que ele abriu o seletor
+function cimCorFoco(chave) { if (_cim && _cim.config) _cimCorAntes[chave] = _cim.config[chave]; }
+// seletor fechado: a cor que estava antes entra na fila
+function cimCorFechou(chave, nova) {
+  var antes = _cimCorAntes[chave];
+  if (antes && String(antes).toLowerCase() !== String(nova).toLowerCase()) {
+    cimCorGuardar(chave, antes);
+    cimRenderEditor();
+  }
+}
+// tocou numa cor da fila: ela volta, e a que estava sai para a fila (dá para ir e voltar)
+function cimCorVoltar(chave, cor) {
+  if (!_cim || !_cim.config) return;
+  var atual = _cim.config[chave];
+  cimCfgSet(chave, cor);
+  cimModeloPersonalizado();
+  cimCorGuardar(chave, atual);
+  cimRenderEditor();
+}
 function cimCor(rotulo, chave, valor) {
-  return '<div class="cim-ctl cor"><label>' + rotulo + '</label><input type="color" value="' + valor + '" oninput="cimCfgSet(\'' + chave + '\',this.value);cimModeloPersonalizado()"></div>';
+  var fila = (_cimCorHist[chave] || []).filter(function(c) { return String(c).toLowerCase() !== String(valor).toLowerCase(); });
+  var hist = fila.length
+    ? '<div class="cim-cor-hist"><i>antes:</i>' + fila.map(function(c) {
+        return '<button type="button" title="Voltar para ' + c + '" style="background:' + c + '" onclick="cimCorVoltar(\'' + chave + '\',\'' + c + '\')"></button>';
+      }).join('') + '</div>'
+    : '';
+  return '<div class="cim-ctl cor"><label>' + rotulo + '</label>' +
+    '<input type="color" value="' + valor + '" onfocus="cimCorFoco(\'' + chave + '\')"' +
+    ' oninput="cimCfgSet(\'' + chave + '\',this.value);cimModeloPersonalizado()"' +
+    ' onchange="cimCorFechou(\'' + chave + '\',this.value)">' + hist + '</div>';
 }
 function cimTexto(rotulo, chave, valor, ph) {
   return '<div class="cim-ctl"><label>' + rotulo + '</label><input type="text" value="' + cimEsc(valor) + '" placeholder="' + cimEsc(ph || '') + '" oninput="cimCfgSet(\'' + chave + '\',this.value)"></div>';
@@ -946,7 +993,9 @@ function cimPainel() {
       cimSlider('Espaço entre as partes', 'espSecao', 40, 200, 10, g.espSecao, 100, '%') +
       cimSelect('Texto', 'alinha', [['center', 'Centralizado'], ['left', 'À esquerda']], g.alinha) +
       cimSelect('Moldura', 'moldura', [['nenhuma', 'Sem moldura'], ['simples', 'Linha fina'], ['dupla', 'Linha dupla'], ['cantos', 'Só os cantos']], g.moldura) + '</div>' +
-      '<details class="cim-det"><summary>🎨 Mudar as cores</summary><div class="cim-cores">' +
+      '<details class="cim-det"><summary>🎨 Mudar as cores</summary>' +
+      '<div class="dica" style="margin:4px 0 8px 0">Debaixo de cada cor fica a fila das que já estiveram ali — trocou e não gostou, é só tocar na anterior para voltar.</div>' +
+      '<div class="cim-cores">' +
       cimCor('Fundo da folha', 'fundo', g.fundo) + cimCor('Título', 'titulo', g.titulo) + cimCor('Nome das partes', 'secao', g.secao) +
       cimCor('Pratos', 'item', g.item) + cimCor('Descrições', 'desc', g.desc) + cimCor('Linhas e enfeites', 'linha', g.linha) + '</div></details>' +
       '<details class="cim-det"><summary>🔤 Trocar o tipo de letra</summary>' +
