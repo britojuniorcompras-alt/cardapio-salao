@@ -595,6 +595,8 @@ const CIM_BASE = {
   moldura: 'simples', separador: 'linha', ouEstilo: 'ou', alinha: 'center', caixa: 'upper', descItalic: true,
   reguaTexto: 'Cardápio', subtitulo: '', rodape: '', contato: false, cw: 100, ch: 210, ouSize: 1,
   cliImg: null, cliNome: '', cliX: 50, cliY: 88, cliTam: 22, cliOpac: 1,
+  wTit: 400, szSub: 1, wSub: 400, szReg: 1, wReg: 400, szSec: 1, wSec: 400,
+  szIt: 1, wIt: 400, szDs: 1, wDs: 400, szTx: 1, wTx: 400, szRod: 1, wRod: 400,
   logo: 'com', logoTam: 25, logoCor: 'original', margem: 9
 };
 
@@ -764,6 +766,8 @@ function cimHtml(c, preview) {
       : `.sec h2::after{content:'';display:block;width:calc(9mm*var(--k));height:0.2mm;background:var(--linha);margin:calc(1.4mm*var(--k)*var(--u)) ${esq ? '0' : 'auto'} calc(1.6mm*var(--k)*var(--u))}`);
   const logoMask = g.logoCor !== 'original';
   const cli = cimLogoCli(g);
+  // cardápio salvo antes destes controles não tem os campos: cai no valor de sempre
+  const N = (v, padrao) => (v === undefined || v === null || isNaN(Number(v))) ? padrao : Number(v);
   // quanto o "ou" (ou o traço/losango) entre as opções cresce ou diminui
   const ouK = Math.max(0.3, Math.min(3, Number(g.ouSize) || 1));
   const logoDim = g.logo === 'com' ? [560, 395] : [560, 284];
@@ -772,39 +776,43 @@ function cimHtml(c, preview) {
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: ${g.fundo}; }
 body { width: ${T.w}mm; margin: 0 auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.pagina { --u: 1; --k: ${k}; --e: ${g.escala}; --linha: ${g.linha}; position: relative; width: ${T.w}mm; height: ${T.h}mm; overflow: hidden;
+.pagina { --u: 1; --k: ${k}; --e: ${g.escala}; --linha: ${g.linha};
+  --wTit: ${N(g.wTit, 400)}; --szSub: ${N(g.szSub, 1)}; --wSub: ${N(g.wSub, 400)};
+  --szReg: ${N(g.szReg, 1)}; --wReg: ${N(g.wReg, 400)}; --szSec: ${N(g.szSec, 1)}; --wSec: ${N(g.wSec, 400)};
+  --szIt: ${N(g.szIt, 1)}; --wIt: ${N(g.wIt, 400)}; --szDs: ${N(g.szDs, 1)}; --wDs: ${N(g.wDs, 400)};
+  --szTx: ${N(g.szTx, 1)}; --wTx: ${N(g.wTx, 400)}; --szRod: ${N(g.szRod, 1)}; --wRod: ${N(g.wRod, 400)}; position: relative; width: ${T.w}mm; height: ${T.h}mm; overflow: hidden;
   padding: ${g.margem + 1}mm ${g.margem}mm ${padB}mm; text-align: ${esq ? 'left' : 'center'}; color: ${g.item}; background: ${g.fundo}; font-family: ${F(g.fItem)}; }
 ${molduraCss}
 .logo { display: block; margin: 0 ${esq ? '0' : 'auto'}; width: ${g.logoTam * k}mm; height: auto; }
 .logo.m { aspect-ratio: ${logoDim[0]} / ${logoDim[1]}; background: ${g.logoCor}; -webkit-mask: url("${cimLogo(g.logo)}") center/contain no-repeat; mask: url("${cimLogo(g.logo)}") center/contain no-repeat; }
 .regua { display: flex; align-items: center; gap: ${2.5 * k}mm; margin-top: calc(4mm * var(--k) * var(--u)); }
 .regua span { flex: 1; height: 0.2mm; background: var(--linha); }
-.regua b { font-weight: 400; font-family: ${F(g.fSecao)}; font-size: calc(6.4pt * var(--k) * var(--u)); letter-spacing: calc(2.8pt * var(--k)); text-transform: uppercase; color: ${g.secao}; }
+.regua b { font-weight: var(--wReg); font-family: ${F(g.fSecao)}; font-size: calc(6.4pt * var(--k) * var(--u) * var(--szReg)); letter-spacing: calc(2.8pt * var(--k)); text-transform: uppercase; color: ${g.secao}; }
 .titulo { margin: calc(3mm * var(--k) * var(--u)) 0 calc(1mm * var(--k) * var(--u)); font-family: ${F(g.fTitulo)}; font-size: calc(${g.titSize}pt * var(--k) * var(--u)); letter-spacing: calc(${g.titTrac}pt * var(--k));
-  text-transform: ${g.titCaixa === 'upper' ? 'uppercase' : 'none'}; color: ${g.titulo}; font-weight: 400; line-height: 1.15; }
-.subtitulo { font-family: ${F(g.fSecao)}; font-size: calc(7.4pt * var(--k) * var(--u) * var(--e)); font-style: italic; color: ${g.desc}; margin-bottom: calc(1mm * var(--k) * var(--u)); }
+  text-transform: ${g.titCaixa === 'upper' ? 'uppercase' : 'none'}; color: ${g.titulo}; font-weight: var(--wTit); line-height: 1.15; }
+.subtitulo { font-family: ${F(g.fSecao)}; font-size: calc(7.4pt * var(--k) * var(--u) * var(--e) * var(--szSub)); font-weight: var(--wSub); font-style: italic; color: ${g.desc}; margin-bottom: calc(1mm * var(--k) * var(--u)); }
 .corpo { margin-top: calc(1mm * var(--k)); }
 .sec { margin-top: calc(${5.2 * g.espSecao}mm * var(--k) * var(--u) * var(--s)); }
-.sec h2 { font-family: ${F(g.fSecao)}; font-weight: 400; color: ${g.secao}; line-height: 1.3;
+.sec h2 { font-family: ${F(g.fSecao)}; font-weight: var(--wSec); color: ${g.secao}; line-height: 1.3;
   ${g.caixa === 'upper'
-    ? `font-size: calc(6.8pt * var(--k) * var(--u) * var(--e) * var(--s)); letter-spacing: calc(${3 * g.trac}pt * var(--k)); text-transform: uppercase;`
-    : `font-size: calc(10.2pt * var(--k) * var(--u) * var(--e) * var(--s)); letter-spacing: calc(${0.3 * g.trac}pt * var(--k)); text-transform: none;`} }
+    ? `font-size: calc(6.8pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szSec)); letter-spacing: calc(${3 * g.trac}pt * var(--k)); text-transform: uppercase;`
+    : `font-size: calc(10.2pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szSec)); letter-spacing: calc(${0.3 * g.trac}pt * var(--k)); text-transform: none;`} }
 ${sepCss}
 .sec.solo h2 { font-family: ${F(g.fTitulo)}; font-size: calc(8.8pt * var(--k) * var(--u) * var(--e)); letter-spacing: calc(0.4pt * var(--k)); text-transform: none; color: ${g.titulo}; }
 .sec.solo h2::after { display: none; }
 .sec.sem { margin-top: calc(${4 * g.espSecao}mm * var(--k) * var(--u)); }
-.it { font-family: ${F(g.fItem)}; font-size: calc(9pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.item}; line-height: 1.5; margin-top: calc(0.6mm * var(--k) * var(--u)); }
-.tx { font-family: ${F(g.fItem)}; font-size: calc(8.6pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.desc}; font-style: italic; line-height: 1.55; }
-.ds { font-family: ${F(g.fItem)}; font-size: calc(6.5pt * var(--k) * var(--u) * var(--e) * var(--s)); color: ${g.desc}; ${g.descItalic ? 'font-style: italic;' : ''} line-height: 1.4; }
+.it { font-family: ${F(g.fItem)}; font-size: calc(9pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szIt)); font-weight: var(--wIt); color: ${g.item}; line-height: 1.5; margin-top: calc(0.6mm * var(--k) * var(--u)); }
+.tx { font-family: ${F(g.fItem)}; font-size: calc(8.6pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szTx)); font-weight: var(--wTx); color: ${g.desc}; font-style: italic; line-height: 1.55; }
+.ds { font-family: ${F(g.fItem)}; font-size: calc(6.5pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szDs)); font-weight: var(--wDs); color: ${g.desc}; ${g.descItalic ? 'font-style: italic;' : ''} line-height: 1.4; }
 .ou { font-family: ${F(g.fItem)}; font-size: calc(7.6pt * var(--k) * var(--u) * var(--e) * ${ouK}); color: ${g.linha}; font-style: italic; margin-top: calc(0.8mm * var(--k) * var(--u)); }
 .ou.orn, .ou.tr { height: calc(2.4mm * var(--k) * var(--u) * ${ouK}); position: relative; font-size: 0; margin-top: calc(0.4mm * var(--k)); }
 .ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k) * ${ouK}); height: calc(1.1mm * var(--k) * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
 .ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k) * ${ouK}); height: calc(0.2mm * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%); }
 .cli-logo { position: absolute; left: ${cli.x}%; top: ${cli.y}%; width: ${cli.tam}mm; transform: translate(-50%, -50%); opacity: ${cli.opac}; z-index: 3; }
 .cli-logo img { width: 100%; height: auto; display: block; }
-.rodape { position: absolute; left: ${g.margem}mm; right: ${g.margem}mm; bottom: ${g.margem - 1}mm; text-align: center; font-family: ${F(g.fSecao)}; color: ${g.desc}; font-size: calc(6pt * var(--k) * var(--e)); line-height: 1.5; }
-.rodape b { display: block; font-weight: 400; font-style: italic; font-size: calc(7.6pt * var(--k) * var(--e)); color: ${g.secao}; margin-bottom: calc(1mm * var(--k)); }
-.rodape small { display: block; font-size: calc(5.6pt * var(--k) * var(--e)); letter-spacing: calc(0.3pt * var(--k)); }
+.rodape { position: absolute; left: ${g.margem}mm; right: ${g.margem}mm; bottom: ${g.margem - 1}mm; text-align: center; font-family: ${F(g.fSecao)}; color: ${g.desc}; font-size: calc(6pt * var(--k) * var(--e) * var(--szRod)); line-height: 1.5; }
+.rodape b { display: block; font-weight: var(--wRod); font-style: italic; font-size: calc(7.6pt * var(--k) * var(--e) * var(--szRod)); color: ${g.secao}; margin-bottom: calc(1mm * var(--k)); }
+.rodape small { display: block; font-size: calc(5.6pt * var(--k) * var(--e) * var(--szRod)); letter-spacing: calc(0.3pt * var(--k)); }
 `;
   const fit = `<script>
 (function () {
@@ -1181,7 +1189,32 @@ function cimPainel() {
       cimSelect('Descrições em', 'descItalic', [['true', 'Itálico'], ['false', 'Normal']], String(g.descItalic)) + '</details>';
   }
 
-  // ---------- 4 · LOGO DO CLIENTE ----------
+  // ---------- 5 · LETRAS ----------
+  if (_cimTab === 'letras') {
+    var PESOS = [['300', 'Fina'], ['400', 'Normal'], ['500', 'Média'], ['600', 'Forte'], ['700', 'Negrito'], ['800', 'Bem forte']];
+    var V = function (x, p) { return (x === undefined || x === null || isNaN(Number(x))) ? p : Number(x); };
+    var bloco = function (titulo, dica, szRot, szChave, szMin, szMax, szVal, szFator, szSuf, wChave, wVal) {
+      return '<div class="cim-grupo"><h4>' + titulo + '</h4>' +
+        cimSlider(szRot, szChave, szMin, szMax, szFator === 1 ? 1 : 5, szVal, szFator, szSuf) +
+        cimSelect('Grossura', wChave, PESOS, String(V(wVal, 400))) +
+        (dica ? '<div class="dica">' + dica + '</div>' : '') + '</div>';
+    };
+    return '<div class="cim-ajuda">✏️ Aqui o senhor mexe em <b>cada escrita da folha separadamente</b> — tamanho e grossura. ' +
+      'Para aumentar tudo de uma vez, use <b>Tamanho das letras</b> na aba Visual.</div>' +
+      bloco('Título do evento', 'O nome grande no alto da folha.', 'Tamanho', 'titSize', 8, 40, V(g.titSize, 15), 1, ' pt', 'wTit', g.wTit) +
+      bloco('Nome das partes', 'Coquetel, Entrada, Pratos Principais...', 'Tamanho', 'szSec', 50, 200, V(g.szSec, 1), 100, '%', 'wSec', g.wSec) +
+      bloco('Pratos', 'O nome de cada prato.', 'Tamanho', 'szIt', 50, 200, V(g.szIt, 1), 100, '%', 'wIt', g.wIt) +
+      bloco('Descrições dos pratos', 'As linhas que começam com <b>-</b>.', 'Tamanho', 'szDs', 50, 200, V(g.szDs, 1), 100, '%', 'wDs', g.wDs) +
+      '<details class="cim-det"><summary>➕ As escritas menores</summary>' +
+      bloco('Subtítulo', 'A linha logo abaixo do título.', 'Tamanho', 'szSub', 50, 200, V(g.szSub, 1), 100, '%', 'wSub', g.wSub) +
+      bloco('Palavra do alto (régua)', 'A palavra entre os traços, acima do título.', 'Tamanho', 'szReg', 50, 200, V(g.szReg, 1), 100, '%', 'wReg', g.wReg) +
+      bloco('Recado / frase solta', 'As partes no modo "Recado".', 'Tamanho', 'szTx', 50, 200, V(g.szTx, 1), 100, '%', 'wTx', g.wTx) +
+      bloco('Rodapé', 'O texto e o contato no pé da folha.', 'Tamanho', 'szRod', 50, 200, V(g.szRod, 1), 100, '%', 'wRod', g.wRod) +
+      '</details>' +
+      '<button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="cimLetrasZerar()">↩ Voltar tudo ao normal</button>';
+  }
+
+  // ---------- 5 · LOGO DO CLIENTE ----------
   if (_cimTab === 'cliente') {
     var cl = cimLogoCli(g);
     if (!_cimLogosLidos) cimLogosCarregar(function () { if (_cimTab === 'cliente') cimRenderEditor(); });
@@ -1258,7 +1291,7 @@ function cimPainel() {
 function cimTamanho(v) { _cim.tamanho = v; cimRenderEditor(); }
 function cimRenderEditor() {
   const c = _cim;
-  const abas = [['conteudo', '1 · Pratos'], ['estilo', '2 · Visual'], ['papel', '3 · Papel e detalhes'], ['cliente', '4 · Logo do cliente']];
+  const abas = [['conteudo', '1 · Pratos'], ['estilo', '2 · Visual'], ['letras', '3 · Letras'], ['papel', '4 · Papel e detalhes'], ['cliente', '5 · Logo do cliente']];
   document.getElementById('cim-editor').innerHTML =
     '<div class="cim-topo"><button class="btn btn-outline" onclick="cimVoltar()">← Catálogo</button>' +
     '<input id="cim-titulo" value="' + cimEsc(c.titulo) + '" placeholder="Nome do evento no cardápio (ex: FRIENDS)" oninput="cimCampo(\'titulo\',this.value)">' +
@@ -1270,10 +1303,23 @@ function cimRenderEditor() {
   cimPrevia();
 }
 function cimAba(a) { _cimTab = a; cimRenderEditor(); }
+// devolve todas as escritas ao tamanho e à grossura de fábrica do modelo escolhido
+function cimLetrasZerar() {
+  if (!_cim) return;
+  var base = cimPreset(_cim.config.modelo || 'creme');
+  ['titSize', 'wTit', 'szSub', 'wSub', 'szReg', 'wReg', 'szSec', 'wSec',
+   'szIt', 'wIt', 'szDs', 'wDs', 'szTx', 'wTx', 'szRod', 'wRod'].forEach(function (k) {
+    _cim.config[k] = base[k];
+  });
+  cimModeloPersonalizado();
+  cimRenderEditor();
+  toast('Letras de volta ao normal deste modelo');
+}
 function cimCampo(k, v) { _cim[k] = v; if (k === 'tamanho') cimPrevia(); else cimPreviaDebounce(); }
 function cimCfgSet(k, v) {
   if (k === 'descItalic') v = (v === true || v === 'true');
-  const num = ['escala', 'espSecao', 'titSize', 'titTrac', 'trac', 'logoTam', 'margem', 'cw', 'ch', 'ouSize', 'cliX', 'cliY', 'cliTam', 'cliOpac'];
+  const num = ['escala', 'espSecao', 'titSize', 'titTrac', 'trac', 'logoTam', 'margem', 'cw', 'ch', 'ouSize', 'cliX', 'cliY', 'cliTam', 'cliOpac',
+    'wTit', 'szSub', 'wSub', 'szReg', 'wReg', 'szSec', 'wSec', 'szIt', 'wIt', 'szDs', 'wDs', 'szTx', 'wTx', 'szRod', 'wRod'];
   if (num.indexOf(k) >= 0) v = Number(v);
   _cim.config[k] = v; cimPreviaDebounce();
 }
