@@ -583,7 +583,16 @@ const CIM_FONTES = {
   montserrat: { n: 'Montserrat (moderna)', css: "'Montserrat',Helvetica,Arial,sans-serif", g: 'Montserrat:ital,wght@0,300;0,400;1,300' },
   lato:       { n: 'Lato (limpa)', css: "'Lato',Helvetica,Arial,sans-serif", g: 'Lato:ital,wght@0,300;0,400;1,300' },
   script:     { n: 'Great Vibes (manuscrita)', css: "'Great Vibes','Brush Script MT',cursive", g: 'Great+Vibes' },
-  helv:       { n: 'Helvetica (simples)', css: 'Helvetica,Arial,sans-serif' }
+  helv:       { n: 'Helvetica (simples)', css: 'Helvetica,Arial,sans-serif' },
+  cinzel:     { n: 'Cinzel (romana, de menú)', css: "'Cinzel',Georgia,serif", g: 'Cinzel:wght@400;700' },
+  marcellus:  { n: 'Marcellus (clássica fina)', css: "'Marcellus',Georgia,serif", g: 'Marcellus' },
+  baskerville:{ n: 'Libre Baskerville (livro)', css: "'Libre Baskerville',Georgia,serif", g: 'Libre+Baskerville:ital,wght@0,400;0,700;1,400' },
+  crimson:    { n: 'Crimson Text (suave)', css: "'Crimson Text',Georgia,serif", g: 'Crimson+Text:ital,wght@0,400;0,600;1,400' },
+  spectral:   { n: 'Spectral (elegante)', css: "'Spectral',Georgia,serif", g: 'Spectral:ital,wght@0,300;0,400;0,600;1,400' },
+  raleway:    { n: 'Raleway (moderna fina)', css: "'Raleway',Helvetica,Arial,sans-serif", g: 'Raleway:ital,wght@0,300;0,400;0,600;1,400' },
+  oswald:     { n: 'Oswald (alta e estreita)', css: "'Oswald',Helvetica,Arial,sans-serif", g: 'Oswald:wght@300;400;600' },
+  dancing:    { n: 'Dancing Script (manuscrita 2)', css: "'Dancing Script','Brush Script MT',cursive", g: 'Dancing+Script:wght@400;700' },
+  times:      { n: 'Times New Roman (de sempre)', css: "'Times New Roman',Times,serif" }
 };
 
 // configuração base: todo cardápio tem TODOS estes campos
@@ -594,7 +603,7 @@ const CIM_BASE = {
   escala: 1, espSecao: 1, titSize: 15, titCaixa: 'normal', titTrac: 0.5, trac: 1,
   moldura: 'simples', separador: 'linha', ouEstilo: 'ou', alinha: 'center', caixa: 'upper', descItalic: true,
   reguaTexto: 'Cardápio', subtitulo: '', rodape: '', contato: false, cw: 100, ch: 210, ouSize: 1,
-  cliImg: null, cliNome: '', cliX: 50, cliY: 88, cliTam: 22, cliOpac: 1,
+  cliImg: null, cliNome: '', cliX: 50, cliY: 88, cliTam: 22, cliOpac: 1, ouCor: '',
   wTit: 400, szSub: 1, wSub: 400, szReg: 1, wReg: 400, szSec: 1, wSec: 400,
   szIt: 1, wIt: 400, szDs: 1, wDs: 400, szTx: 1, wTx: 400, szRod: 1, wRod: 400,
   logo: 'com', logoTam: 25, logoCor: 'original', margem: 9
@@ -744,7 +753,8 @@ function cimHtml(c, preview) {
 
   // fontes do Google usadas
   const gf = [...new Set([g.fTitulo, g.fSecao, g.fItem].map(x => (CIM_FONTES[x] || {}).g).filter(Boolean))];
-  const fontLink = gf.length ? '<link href="https://fonts.googleapis.com/css2?' + gf.map(x => 'family=' + x).join('&') + '&display=swap" rel="stylesheet">' : '';
+  // um <link> para cada fonte: assim uma fonte com problema não derruba as outras
+  const fontLink = gf.map(x => '<link href="https://fonts.googleapis.com/css2?family=' + x + '&display=swap" rel="stylesheet">').join('');
 
   const comRodape = !!(g.rodape || g.contato);
   const padB = g.margem + (comRodape ? (g.contato ? 15 : 8) * k : 0);
@@ -770,6 +780,8 @@ function cimHtml(c, preview) {
   const N = (v, padrao) => (v === undefined || v === null || isNaN(Number(v))) ? padrao : Number(v);
   // quanto o "ou" (ou o traço/losango) entre as opções cresce ou diminui
   const ouK = Math.max(0.3, Math.min(3, Number(g.ouSize) || 1));
+  // sem cor escolhida, o "ou" segue a cor das linhas, como sempre foi
+  const ouCor = g.ouCor || g.linha;
   const logoDim = g.logo === 'com' ? [560, 395] : [560, 284];
   const css = `
 @page { size: ${T.w}mm ${T.h}mm; margin: 0; }
@@ -780,7 +792,7 @@ body { width: ${T.w}mm; margin: 0 auto; -webkit-print-color-adjust: exact; print
   --wTit: ${N(g.wTit, 400)}; --szSub: ${N(g.szSub, 1)}; --wSub: ${N(g.wSub, 400)};
   --szReg: ${N(g.szReg, 1)}; --wReg: ${N(g.wReg, 400)}; --szSec: ${N(g.szSec, 1)}; --wSec: ${N(g.wSec, 400)};
   --szIt: ${N(g.szIt, 1)}; --wIt: ${N(g.wIt, 400)}; --szDs: ${N(g.szDs, 1)}; --wDs: ${N(g.wDs, 400)};
-  --szTx: ${N(g.szTx, 1)}; --wTx: ${N(g.wTx, 400)}; --szRod: ${N(g.szRod, 1)}; --wRod: ${N(g.wRod, 400)}; position: relative; width: ${T.w}mm; height: ${T.h}mm; overflow: hidden;
+  --szTx: ${N(g.szTx, 1)}; --wTx: ${N(g.wTx, 400)}; --szRod: ${N(g.szRod, 1)}; --wRod: ${N(g.wRod, 400)}; --ouCor: ${ouCor}; position: relative; width: ${T.w}mm; height: ${T.h}mm; overflow: hidden;
   padding: ${g.margem + 1}mm ${g.margem}mm ${padB}mm; text-align: ${esq ? 'left' : 'center'}; color: ${g.item}; background: ${g.fundo}; font-family: ${F(g.fItem)}; }
 ${molduraCss}
 .logo { display: block; margin: 0 ${esq ? '0' : 'auto'}; width: ${g.logoTam * k}mm; height: auto; }
@@ -804,10 +816,10 @@ ${sepCss}
 .it { font-family: ${F(g.fItem)}; font-size: calc(9pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szIt)); font-weight: var(--wIt); color: ${g.item}; line-height: 1.5; margin-top: calc(0.6mm * var(--k) * var(--u)); }
 .tx { font-family: ${F(g.fItem)}; font-size: calc(8.6pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szTx)); font-weight: var(--wTx); color: ${g.desc}; font-style: italic; line-height: 1.55; }
 .ds { font-family: ${F(g.fItem)}; font-size: calc(6.5pt * var(--k) * var(--u) * var(--e) * var(--s) * var(--szDs)); font-weight: var(--wDs); color: ${g.desc}; ${g.descItalic ? 'font-style: italic;' : ''} line-height: 1.4; }
-.ou { font-family: ${F(g.fItem)}; font-size: calc(7.6pt * var(--k) * var(--u) * var(--e) * ${ouK}); color: ${g.linha}; font-style: italic; margin-top: calc(0.8mm * var(--k) * var(--u)); }
+.ou { font-family: ${F(g.fItem)}; font-size: calc(7.6pt * var(--k) * var(--u) * var(--e) * ${ouK}); color: ${ouCor}; font-style: italic; margin-top: calc(0.8mm * var(--k) * var(--u)); }
 .ou.orn, .ou.tr { height: calc(2.4mm * var(--k) * var(--u) * ${ouK}); position: relative; font-size: 0; margin-top: calc(0.4mm * var(--k)); }
-.ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k) * ${ouK}); height: calc(1.1mm * var(--k) * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
-.ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k) * ${ouK}); height: calc(0.2mm * ${ouK}); background: var(--linha); transform: translate(${esq ? '0' : '-50%'}, -50%); }
+.ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k) * ${ouK}); height: calc(1.1mm * var(--k) * ${ouK}); background: var(--ouCor); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
+.ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k) * ${ouK}); height: calc(0.2mm * ${ouK}); background: var(--ouCor); transform: translate(${esq ? '0' : '-50%'}, -50%); }
 .cli-logo { position: absolute; left: ${cli.x}%; top: ${cli.y}%; width: ${cli.tam}mm; transform: translate(-50%, -50%); opacity: ${cli.opac}; z-index: 3; }
 .cli-logo img { width: 100%; height: auto; display: block; }
 .rodape { position: absolute; left: ${g.margem}mm; right: ${g.margem}mm; bottom: ${g.margem - 1}mm; text-align: center; font-family: ${F(g.fSecao)}; color: ${g.desc}; font-size: calc(6pt * var(--k) * var(--e) * var(--szRod)); line-height: 1.5; }
@@ -1186,6 +1198,9 @@ function cimPainel() {
       cimSelect('Enfeite sob o nome da parte', 'separador', [['linha', 'Traço curto'], ['ornamento', 'Losango ◆'], ['nenhum', 'Nenhum']], g.separador) +
       cimSelect('Entre as opções', 'ouEstilo', [['ou', 'A palavra "ou"'], ['traco', 'Traço curto'], ['ornamento', 'Losango ◆']], g.ouEstilo) +
       cimSlider('Tamanho do "ou" entre as opções', 'ouSize', 50, 250, 10, g.ouSize, 100, '%') +
+      cimCor('Cor do "ou"', 'ouCor', g.ouCor || g.linha) +
+      (g.ouCor ? '<button class="btn btn-outline btn-sm" style="width:100%;margin:-2px 0 8px" onclick="cimOuCorSeguir()">↩ Voltar a seguir a cor das linhas</button>'
+               : '<div class="dica" style="margin:-2px 0 8px">Agora o "ou" acompanha a cor das linhas. Escolhendo uma cor acima, ele passa a ter a dele.</div>') +
       cimSelect('Descrições em', 'descItalic', [['true', 'Itálico'], ['false', 'Normal']], String(g.descItalic)) + '</details>';
   }
 
@@ -1193,17 +1208,18 @@ function cimPainel() {
   if (_cimTab === 'letras') {
     var PESOS = [['300', 'Fina'], ['400', 'Normal'], ['500', 'Média'], ['600', 'Forte'], ['700', 'Negrito'], ['800', 'Bem forte']];
     var V = function (x, p) { return (x === undefined || x === null || isNaN(Number(x))) ? p : Number(x); };
-    var bloco = function (titulo, dica, szRot, szChave, szMin, szMax, szVal, szFator, szSuf, wChave, wVal) {
+    var bloco = function (titulo, dica, szRot, szChave, szMin, szMax, szVal, szFator, szSuf, wChave, wVal, fChave, fVal) {
       return '<div class="cim-grupo"><h4>' + titulo + '</h4>' +
+        (fChave ? cimSelect('Tipo de letra', fChave, CIM_FONTES_OPC, fVal) : '') +
         cimSlider(szRot, szChave, szMin, szMax, szFator === 1 ? 1 : 5, szVal, szFator, szSuf) +
         cimSelect('Grossura', wChave, PESOS, String(V(wVal, 400))) +
         (dica ? '<div class="dica">' + dica + '</div>' : '') + '</div>';
     };
-    return '<div class="cim-ajuda">✏️ Aqui o senhor mexe em <b>cada escrita da folha separadamente</b> — tamanho e grossura. ' +
+    return '<div class="cim-ajuda">✏️ Aqui o senhor mexe em <b>cada escrita da folha separadamente</b> — tipo de letra, tamanho e grossura. ' +
       'Para aumentar tudo de uma vez, use <b>Tamanho das letras</b> na aba Visual.</div>' +
-      bloco('Título do evento', 'O nome grande no alto da folha.', 'Tamanho', 'titSize', 8, 40, V(g.titSize, 15), 1, ' pt', 'wTit', g.wTit) +
-      bloco('Nome das partes', 'Coquetel, Entrada, Pratos Principais...', 'Tamanho', 'szSec', 50, 200, V(g.szSec, 1), 100, '%', 'wSec', g.wSec) +
-      bloco('Pratos', 'O nome de cada prato.', 'Tamanho', 'szIt', 50, 200, V(g.szIt, 1), 100, '%', 'wIt', g.wIt) +
+      bloco('Título do evento', 'O nome grande no alto da folha.', 'Tamanho', 'titSize', 8, 40, V(g.titSize, 15), 1, ' pt', 'wTit', g.wTit, 'fTitulo', g.fTitulo) +
+      bloco('Nome das partes', 'Coquetel, Entrada, Pratos Principais... <b>O tipo de letra aqui vale também para o subtítulo, a palavra do alto e o rodapé.</b>', 'Tamanho', 'szSec', 50, 200, V(g.szSec, 1), 100, '%', 'wSec', g.wSec, 'fSecao', g.fSecao) +
+      bloco('Pratos', 'O nome de cada prato. <b>O tipo de letra aqui vale também para as descrições e os recados.</b>', 'Tamanho', 'szIt', 50, 200, V(g.szIt, 1), 100, '%', 'wIt', g.wIt, 'fItem', g.fItem) +
       bloco('Descrições dos pratos', 'As linhas que começam com <b>-</b>.', 'Tamanho', 'szDs', 50, 200, V(g.szDs, 1), 100, '%', 'wDs', g.wDs) +
       '<details class="cim-det"><summary>➕ As escritas menores</summary>' +
       bloco('Subtítulo', 'A linha logo abaixo do título.', 'Tamanho', 'szSub', 50, 200, V(g.szSub, 1), 100, '%', 'wSub', g.wSub) +
@@ -1304,6 +1320,13 @@ function cimRenderEditor() {
 }
 function cimAba(a) { _cimTab = a; cimRenderEditor(); }
 // devolve todas as escritas ao tamanho e à grossura de fábrica do modelo escolhido
+// volta o "ou" a seguir a cor das linhas e dos enfeites
+function cimOuCorSeguir() {
+  if (!_cim) return;
+  cimCfgSet('ouCor', '');
+  cimRenderEditor();
+  toast('O "ou" voltou a seguir a cor das linhas');
+}
 function cimLetrasZerar() {
   if (!_cim) return;
   var base = cimPreset(_cim.config.modelo || 'creme');
