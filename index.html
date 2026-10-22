@@ -829,18 +829,29 @@ ${sepCss}
   const fit = `<script>
 (function () {
   var p = document.querySelector('.pagina');
+  // Mede só o TEXTO que corre na folha. O logo do cliente flutua por cima e, quando
+  // fica no pé da página, esticava a medida: o app achava que o texto não tinha cabido
+  // e encolhia a letra do cardápio inteiro.
+  function transborda() {
+    var c = p.querySelector('.corpo');
+    if (!c) return p.scrollHeight > p.clientHeight + 1;
+    var rp = p.getBoundingClientRect(), rc = c.getBoundingClientRect();
+    var pb = parseFloat(getComputedStyle(p).paddingBottom) || 0;
+    return rc.bottom > rp.bottom - pb + 1;
+  }
   function fit() {
     var u = 1; p.style.setProperty('--u', u);
-    while (p.scrollHeight > p.clientHeight + 1 && u > 0.4) { u -= 0.02; p.style.setProperty('--u', u); }
+    while (transborda() && u > 0.4) { u -= 0.02; p.style.setProperty('--u', u); }
   }
   function avisar() {
-    var corta = p.scrollHeight > p.clientHeight + 1;
+    var corta = transborda();
     var b = document.getElementById('aviso-corte');
     if (b) b.style.display = corta ? '' : 'none';
     try { if (window.parent !== window) window.parent.postMessage({ cim: 1, corta: corta }, '*'); } catch (e) {}
     // na prévia dá para pegar o logo do cliente e largar onde quiser
     var _cl = document.getElementById('cli-logo'), _pg = document.querySelector('.pagina');
-    if (_cl && _pg && window.parent !== window) {
+    if (_cl && _pg && window.parent !== window && !_cl.dataset.arrastavel) {
+      _cl.dataset.arrastavel = '1';
       _cl.style.cursor = 'grab'; _cl.style.touchAction = 'none';
       var _arr = false;
       var _mover = function (ev) {
