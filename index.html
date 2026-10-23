@@ -454,6 +454,12 @@
   .cim-cor-hist > i { font-style: normal; font-size: 10.5px; color: rgba(var(--tinta-rgb),.55); margin-right: 1px; }
   .cim-cor-hist button { width: 19px; height: 19px; border-radius: 5px; border: 1px solid rgba(var(--tinta-rgb),.28); padding: 0; cursor: pointer; flex: none; }
   .cim-cor-hist button:hover { transform: scale(1.18); border-color: var(--verde); }
+  .cim-modos { display: grid; gap: 7px; }
+  .cim-modo { display: block; text-align: left; border: 1.5px solid rgba(var(--tinta-rgb),0.2); background: var(--surface); border-radius: 10px; padding: 9px 11px; cursor: pointer; color: inherit; }
+  .cim-modo b { display: block; font-size: 14px; color: var(--verde); }
+  .cim-modo small { display: block; font-size: 12px; opacity: .72; margin-top: 2px; line-height: 1.35; }
+  .cim-modo.on { border-color: var(--verde); background: rgba(30,64,40,.08); }
+  .cim-lados { display: flex; gap: 6px; flex-wrap: wrap; }
   .cim-chips, .cim-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .cim-chip { border: 1.5px solid rgba(var(--tinta-rgb),0.2); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--verde); }
   .cim-chip.on { background: var(--verde); color: #fff; }
@@ -603,7 +609,7 @@ const CIM_BASE = {
   escala: 1, espSecao: 1, titSize: 15, titCaixa: 'normal', titTrac: 0.5, trac: 1,
   moldura: 'simples', separador: 'linha', ouEstilo: 'ou', alinha: 'center', caixa: 'upper', descItalic: true,
   reguaTexto: 'Cardápio', subtitulo: '', rodape: '', contato: false, cw: 100, ch: 210, ouSize: 1,
-  cliImg: null, cliNome: '', cliX: 50, cliY: 88, cliTam: 22, cliOpac: 1, ouCor: '',
+  cliImg: null, cliNome: '', cliX: 50, cliY: 88, cliTam: 22, cliOpac: 1, cliModo: 'solto', ouCor: '',
   wTit: 400, szSub: 1, wSub: 400, szReg: 1, wReg: 400, szSec: 1, wSec: 400,
   szIt: 1, wIt: 400, szDs: 1, wDs: 400, szTx: 1, wTx: 400, szRod: 1, wRod: 400,
   logo: 'com', logoTam: 25, logoCor: 'original', margem: 9
@@ -703,6 +709,10 @@ const CIM_AMOSTRA = [
 
 let _cimLista = [], _cim = null, _cimTimer = null, _cimTab = 'conteudo', _cimZoom = 1;
 
+function cimSemAst(t) { return String(t == null ? '' : t).replace(/\*/g, ''); }
+// Negrito a pedido: o usuario poe *asteriscos* em volta das palavras que quer
+// em negrito no titulo ou no subtitulo. O resto do texto continua igual.
+function cimNeg(t) { return cimEsc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>'); }
 function cimEsc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function cimJuntar(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1]; }
 function cimPontuar(s) { s = String(s).trim(); return /[.!?,;:]$/.test(s) ? s : s + '.'; }
@@ -802,6 +812,8 @@ ${molduraCss}
 .regua b { font-weight: var(--wReg); font-family: ${F(g.fSecao)}; font-size: calc(6.4pt * var(--k) * var(--u) * var(--szReg)); letter-spacing: calc(2.8pt * var(--k)); text-transform: uppercase; color: ${g.secao}; }
 .titulo { margin: calc(3mm * var(--k) * var(--u)) 0 calc(1mm * var(--k) * var(--u)); font-family: ${F(g.fTitulo)}; font-size: calc(${g.titSize}pt * var(--k) * var(--u)); letter-spacing: calc(${g.titTrac}pt * var(--k));
   text-transform: ${g.titCaixa === 'upper' ? 'uppercase' : 'none'}; color: ${g.titulo}; font-weight: var(--wTit); line-height: 1.15; }
+.titulo b { font-weight: ${Math.min(900, Math.max(700, (Number(g.wTit) || 400) + 300))}; }
+.subtitulo b { font-weight: ${Math.min(900, Math.max(700, (Number(g.wSub) || 400) + 300))}; }
 .subtitulo { font-family: ${F(g.fSecao)}; font-size: calc(7.4pt * var(--k) * var(--u) * var(--e) * var(--szSub)); font-weight: var(--wSub); font-style: italic; color: ${g.desc}; margin-bottom: calc(1mm * var(--k) * var(--u)); }
 .corpo { margin-top: calc(1mm * var(--k)); }
 .sec { margin-top: calc(${5.2 * g.espSecao}mm * var(--k) * var(--u) * var(--s)); }
@@ -820,11 +832,16 @@ ${sepCss}
 .ou.orn, .ou.tr { height: calc(2.4mm * var(--k) * var(--u) * ${ouK}); position: relative; font-size: 0; margin-top: calc(0.4mm * var(--k)); }
 .ou.orn::before { content: ''; position: absolute; left: ${esq ? '0.6mm' : '50%'}; top: 50%; width: calc(1.1mm * var(--k) * ${ouK}); height: calc(1.1mm * var(--k) * ${ouK}); background: var(--ouCor); transform: translate(${esq ? '0' : '-50%'}, -50%) rotate(45deg); }
 .ou.tr::before { content: ''; position: absolute; left: ${esq ? '0' : '50%'}; top: 50%; width: calc(5mm * var(--k) * ${ouK}); height: calc(0.2mm * ${ouK}); background: var(--ouCor); transform: translate(${esq ? '0' : '-50%'}, -50%); }
-.cli-logo { position: absolute; left: ${cli.x}%; top: ${cli.y}%; width: ${cli.tam}mm; transform: translate(-50%, -50%); opacity: ${cli.opac}; z-index: 3; }
+.cli-logo { width: ${cli.tam}mm; opacity: ${cli.opac}; }
 .cli-logo img { width: 100%; height: auto; display: block; }
+.cli-logo.solto { position: absolute; left: ${cli.x}%; top: ${cli.y}%; transform: translate(-50%, -50%); z-index: ${cli.modo === 'fundo' ? 0 : 4}; }
+.cli-logo.fluxo { position: relative; z-index: 2; margin: calc(2.5mm * var(--k) * var(--u)) ${cli.x > 66 ? '0' : 'auto'} calc(2.5mm * var(--k) * var(--u)) ${cli.x < 34 ? '0' : 'auto'}; }
 .rodape { position: absolute; left: ${g.margem}mm; right: ${g.margem}mm; bottom: ${g.margem - 1}mm; text-align: center; font-family: ${F(g.fSecao)}; color: ${g.desc}; font-size: calc(6pt * var(--k) * var(--e) * var(--szRod)); line-height: 1.5; }
 .rodape b { display: block; font-weight: var(--wRod); font-style: italic; font-size: calc(7.6pt * var(--k) * var(--e) * var(--szRod)); color: ${g.secao}; margin-bottom: calc(1mm * var(--k)); }
 .rodape small { display: block; font-size: calc(5.6pt * var(--k) * var(--e) * var(--szRod)); letter-spacing: calc(0.3pt * var(--k)); }
+/* o texto fica sempre numa camada acima do logo de fundo (marca d'água) */
+.regua, .titulo, .subtitulo, .corpo { position: relative; z-index: 2; }
+.rodape { z-index: 2; }
 `;
   const fit = `<script>
 (function () {
@@ -883,17 +900,20 @@ ${sepCss}
     (logoMask ? '<div class="logo m"></div>' : '<img class="logo" src="' + cimLogo(g.logo) + '" alt="a bela Sintra">');
   const rodapeHtml = comRodape ? '<div class="rodape">' + (g.rodape ? '<b>' + cimEsc(g.rodape) + '</b>' : '') +
     (g.contato ? '<small>Rua Bela Cintra, 2325 · Cerqueira César · São Paulo/SP</small><small>(11) 3086-2510 · @restauranteabelasintra</small>' : '') + '</div>' : '';
-  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Cardápio - ' + cimEsc(c.titulo || '') + '</title>' + fontLink +
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Cardápio - ' + cimEsc(cimSemAst(c.titulo || '')) + '</title>' + fontLink +
     '<style>' + css + (preview ? 'body{margin:0}' : '@media screen{body{background:#e9e9e4;padding:70px 0 20px}.pagina{box-shadow:0 2px 14px rgba(0,0,0,.25)}.barra{position:fixed;top:0;left:0;right:0;background:#1e4028;padding:10px;display:flex;gap:8px;z-index:9}.barra button{flex:1;padding:12px;font-size:15px;font-weight:bold;border:0;border-radius:8px;background:#c9b47a;color:#1e2a1e;cursor:pointer}.barra button.s{background:#3e5c46;color:#fff}} @media print{.barra,#aviso-corte{display:none !important}}') +
     '</style></head><body>' +
     (preview ? '' : '<div class="barra"><button onclick="window.print()">🖨️ Imprimir / Salvar PDF</button><button class="s" onclick="window.close()">Fechar</button></div>' +
     '<div id="aviso-corte" style="display:none;position:fixed;top:56px;left:0;right:0;background:#c0392b;color:#fff;font:600 14px/1.4 system-ui;padding:9px 12px;text-align:center;z-index:9">⚠️ O texto não cabe nesta folha e parte está cortada. Use um papel maior ou tire alguns pratos.</div>') +
     '<div class="pagina">' +
-    (cli.img ? '<div class="cli-logo" id="cli-logo"><img src="' + cli.img + '" alt=""></div>' : '') + logoHtml +
+    (cli.img && (cli.modo === 'solto' || cli.modo === 'fundo') ? '<div class="cli-logo solto" id="cli-logo"><img src="' + cli.img + '" alt=""></div>' : '') + logoHtml +
+    (cli.img && cli.modo === 'alto' ? '<div class="cli-logo fluxo"><img src="' + cli.img + '" alt=""></div>' : '') +
     (g.reguaTexto ? '<div class="regua"><span></span><b>' + cimEsc(g.reguaTexto) + '</b><span></span></div>' : '') +
-    (c.titulo ? '<div class="titulo">' + cimEsc(c.titulo) + '</div>' : '') +
-    (g.subtitulo ? '<div class="subtitulo">' + cimEsc(g.subtitulo) + '</div>' : '') +
-    '<div class="corpo">' + secoes + '</div>' + rodapeHtml + '</div>' + fit + '</body></html>';
+    (c.titulo ? '<div class="titulo">' + cimNeg(c.titulo) + '</div>' : '') +
+    (g.subtitulo ? '<div class="subtitulo">' + cimNeg(g.subtitulo) + '</div>' : '') +
+    '<div class="corpo">' + secoes +
+    (cli.img && cli.modo === 'pe' ? '<div class="cli-logo fluxo"><img src="' + cli.img + '" alt=""></div>' : '') +
+    '</div>' + rodapeHtml + '</div>' + fit + '</body></html>';
 }
 
 // ---------- lista + catálogo ----------
@@ -923,7 +943,7 @@ function cimMostrarLista() {
     ? '<div class="empty-state" style="padding:18px"><p>Nenhum cardápio salvo ainda. Escolha um modelo acima para começar.</p></div>'
     : '<div class="cim-grid">' + _cimLista.map(c => {
         const g = cimCfg(c);
-        return '<div class="cim-card"><h3>' + cimEsc(c.titulo || '(sem título)') + '</h3>' +
+        return '<div class="cim-card"><h3>' + cimEsc(cimSemAst(c.titulo) || '(sem título)') + '</h3>' +
           '<small>' + (c.secoes || []).length + ' seções · ' + cimEsc((CIM_MODELOS[g.modelo] || { nome: 'Personalizado' }).nome) + ' · ' + cimTam(Object.assign({}, c, { config: g })).n + '</small>' +
           '<div class="acts"><button class="btn btn-primary btn-sm" onclick="cimAbrir(\'' + c.id + '\')">✏️ Abrir</button>' +
           '<button class="btn btn-outline btn-sm" onclick="cimImprimirSalvo(\'' + c.id + '\')">🖨️ Imprimir</button>' +
@@ -987,7 +1007,7 @@ var _cimLogos = [];           // biblioteca guardada no Supabase
 var _cimLogosLidos = false;
 
 function cimLogoCliPadrao() {
-  return { img: null, nome: '', x: 50, y: 88, tam: 22, opac: 1 };
+  return { img: null, nome: '', x: 50, y: 88, tam: 22, opac: 1, modo: 'solto' };
 }
 function cimLogoCli(g) {
   var d = cimLogoCliPadrao();
@@ -995,7 +1015,8 @@ function cimLogoCli(g) {
            x: g.cliX == null ? d.x : Number(g.cliX),
            y: g.cliY == null ? d.y : Number(g.cliY),
            tam: g.cliTam == null ? d.tam : Number(g.cliTam),
-           opac: g.cliOpac == null ? d.opac : Number(g.cliOpac) };
+           opac: g.cliOpac == null ? d.opac : Number(g.cliOpac),
+           modo: g.cliModo || d.modo };
 }
 
 // Reduz a imagem antes de guardar: logo de cliente costuma vir enorme e
@@ -1087,6 +1108,11 @@ function cimLogoTirar() {
 }
 
 // atalhos de alinhamento: 9 pontos da folha
+function cimLogoModo(m) {
+  cimCfgSet('cliModo', m);
+  if ((m === 'alto' || m === 'pe') && _cim.config.cliY != null) { /* y nao vale nos modos de fluxo */ }
+  cimRenderEditor();
+}
 function cimLogoCanto(x, y) {
   cimCfgSet('cliX', x);
   cimCfgSet('cliY', y);
@@ -1179,7 +1205,7 @@ function cimPainel() {
       '<label>Letra:</label><select onchange="cimSec(' + i + ',\'escala\',this.value)">' +
       [['0.85', 'Menor'], ['1', 'Normal'], ['1.15', 'Maior'], ['1.3', 'Bem maior']].map(o => '<option value="' + o[0] + '"' + (String(s.escala || 1) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div>' +
       '</div>').join('');
-    return '<div class="cim-ajuda">✏️ Escreva <b>um prato por linha</b>. Para explicar um prato, faça a linha de baixo começar com <b>-</b>. Parte sem nenhum prato vira só um título (ex: Amouse-bouche). Tudo que você digitar aparece na hora na prévia ao lado.</div>' +
+    return '<div class="cim-ajuda">✏️ Escreva <b>um prato por linha</b>. Para explicar um prato, faça a linha de baixo começar com <b>-</b>. Parte sem nenhum prato vira só um título (ex: Amouse-bouche). Tudo que você digitar aparece na hora na prévia ao lado.<br><br>✨ No <b>nome do evento</b> (lá em cima) e no subtítulo, ponha <b>*asteriscos*</b> em volta das palavras que quiser em negrito — ex: <b>JANTAR *HARMONIZADO*</b>.</div>' +
       secs +
       '<div class="cim-add"><b>➕ Acrescentar parte:</b>' + Object.keys(CIM_SECOES_PRONTAS).map(n => '<button class="cim-chip" onclick="cimAddSec(\'' + n + '\')">' + n + '</button>').join('') +
       '<button class="cim-chip" onclick="cimAddSec(\'\')">Em branco</button></div>';
@@ -1267,6 +1293,31 @@ function cimPainel() {
 
     if (!cl.img) return '<div class="cim-ajuda">🏢 Evento de empresa? Carregue o logo do cliente e ponha onde quiser na folha. O logo da casa não sai.</div>' + atual + escolher + bib;
 
+    var MODOS = [['alto', '⬆️ No alto', 'Abre um espaço no alto da folha, acima dos pratos. Nunca encosta no texto.'],
+                 ['pe', '⬇️ No pé', 'Abre um espaço embaixo, depois do último prato. Nunca encosta no texto.'],
+                 ['solto', '✋ Solto, por cima', 'Você arrasta e põe onde quiser. Pode cobrir o texto se encostar nele.'],
+                 ['fundo', '💧 Marca d\'água', 'Atrás de tudo. O texto passa por cima e continua legível (baixe a força da cor).']];
+    var escolhaModo = '<div class="cim-grupo"><h4>📐 Como o logo entra na folha</h4><div class="cim-modos">' +
+      MODOS.map(function (m) {
+        return '<button class="cim-modo' + (cl.modo === m[0] ? ' on' : '') + '" onclick="cimLogoModo(\'' + m[0] + '\')">' +
+          '<b>' + m[1] + '</b><small>' + m[2] + '</small></button>';
+      }).join('') + '</div></div>';
+
+    if (cl.modo === 'alto' || cl.modo === 'pe') {
+      return '<div class="cim-ajuda">🏢 Nesse jeito o cardápio <b>abre espaço</b> para o logo — ele não cobre nem fica por baixo das letras.</div>' +
+        atual + escolher + escolhaModo +
+        '<div class="cim-grupo"><h4>Ajuste fino</h4>' +
+        '<div class="cim-ctl"><label>De que lado</label><div class="cim-lados">' +
+        [['Esquerda', 12], ['Centro', 50], ['Direita', 88]].map(function (l) {
+          var on = (l[1] === 12 && cl.x < 34) || (l[1] === 50 && cl.x >= 34 && cl.x <= 66) || (l[1] === 88 && cl.x > 66);
+          return '<button class="cim-chip' + (on ? ' on' : '') + '" onclick="cimCfgSet(\'cliX\',' + l[1] + ');cimRenderEditor()">' + l[0] + '</button>';
+        }).join('') + '</div></div>' +
+        cimSlider('Tamanho do logo', 'cliTam', 8, 90, 1, cl.tam, 1, ' mm') +
+        cimSlider('Força da cor', 'cliOpac', 10, 100, 5, cl.opac, 100, '%') +
+        '<div class="dica">Se o cardápio estiver cheio, um logo grande faz as letras diminuírem para tudo caber. Diminua o logo se isso incomodar.</div></div>' +
+        bib;
+    }
+
     var cantos = [['Topo esquerda', 12, 8], ['Topo centro', 50, 8], ['Topo direita', 88, 8],
                   ['Meio esquerda', 12, 50], ['Bem no centro', 50, 50], ['Meio direita', 88, 50],
                   ['Rodapé esquerda', 12, 92], ['Rodapé centro', 50, 92], ['Rodapé direita', 88, 92]];
@@ -1276,8 +1327,9 @@ function cimPainel() {
         return '<button class="' + (aceso ? 'on' : '') + '" title="' + p[0] + '" onclick="cimLogoCanto(' + p[1] + ',' + p[2] + ')"><i></i></button>';
       }).join('') + '</div><div class="dica">Toque num quadradinho para encaixar. O do meio centraliza na folha.</div></div>';
 
-    return '<div class="cim-ajuda">🏢 Arraste o logo direto na prévia ao lado, ou use os atalhos e as barras aqui embaixo.</div>' +
-      atual + escolher + grade +
+    return '<div class="cim-ajuda">🏢 Arraste o logo direto na prévia ao lado, ou use os atalhos e as barras aqui embaixo.' +
+      (cl.modo === 'solto' ? ' Se ele estiver cobrindo as letras, troque para <b>No alto</b>, <b>No pé</b> ou <b>Marca d\'água</b> logo abaixo.' : '') + '</div>' +
+      atual + escolher + escolhaModo + grade +
       '<div class="cim-grupo"><h4>Ajuste fino</h4>' +
       '<div class="cim-ctl"><label>Da esquerda para a direita</label><div class="cim-sl">' +
       '<input id="cim-cli-x" type="range" min="0" max="100" step="1" value="' + Math.round(cl.x) + '" oninput="cimCfgSet(\'cliX\',this.value);this.nextElementSibling.textContent=this.value+\'%\'"><span>' + Math.round(cl.x) + '%</span></div></div>' +
